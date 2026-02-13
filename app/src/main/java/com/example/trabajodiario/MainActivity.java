@@ -21,19 +21,29 @@ public class MainActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
 
-                // Comprobamos qué eligió el usuario
+                // 1. Verificamos ubicación (Obligatoria para la práctica)
                 boolean fineLocation = result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false);
                 boolean coarseLocation = result.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false);
 
-                if (fineLocation) {
-                    // El usuario eligió "Precisa"
-                    Toast.makeText(this, "Ubicación EXACTA concedida", Toast.LENGTH_SHORT).show();
-                } else if (coarseLocation) {
-                    // El usuario eligió "Aproximada"
-                    Toast.makeText(this, "Ubicación APROXIMADA concedida", Toast.LENGTH_SHORT).show();
+                // 2. Verificamos acceso al sistema/música (Opcional)
+                boolean storageGranted;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    storageGranted = result.getOrDefault(Manifest.permission.READ_MEDIA_AUDIO, false);
                 } else {
-                    // No eligió ninguna de las dos: Cerramos la app como pediste
-                    Toast.makeText(this, "No se puede usar la app sin ubicación. Cerrando...", Toast.LENGTH_LONG).show();
+                    storageGranted = result.getOrDefault(Manifest.permission.READ_EXTERNAL_STORAGE, false);
+                }
+
+                // Lógica de decisión
+                if (fineLocation || coarseLocation) {
+                    // Si aceptó ubicación pero NO el acceso al sistema
+                    if (!storageGranted) {
+                        Toast.makeText(this, "Ubicación lista. No podrás elegir música personalizada, pero puedes usar la app.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, "Todos los permisos concedidos.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    // Si denegó la ubicación (crítico), cerramos
+                    Toast.makeText(this, "Permiso de ubicación denegado. La app se cerrará.", Toast.LENGTH_LONG).show();
                     finish();
                 }
             });
@@ -80,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
             permissionsList.add(Manifest.permission.READ_MEDIA_AUDIO);
         } else {
             permissionsList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+
         }
 
         String[] permissions = permissionsList.toArray(new String[0]);

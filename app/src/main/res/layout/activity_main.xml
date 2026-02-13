@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#974343"
+    android:scrollbarSize="4dp"
     tools:context=".MainActivity">
 
     <TextView
@@ -30,7 +31,9 @@
         android:layout_marginTop="97dp"
         android:background="#B33636"
         android:backgroundTint="#FFFFFF"
-        android:text="Entradas Guardadas"
+        android:fontFamily="sans-serif-condensed"
+        android:text=" >- >- "
+        android:textSize="48sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
